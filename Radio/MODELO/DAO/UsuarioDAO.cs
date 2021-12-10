@@ -54,8 +54,9 @@ namespace Radio.MODELO.DAO
             return usuarios;
         }
 
-        public static void registrarUsuario(Usuario usuario)
+        public static bool getUsuarioRepetido(String nombreUsuario)
         {
+            bool esRegistrado = false;
             SqlConnection conn = null;
             try
             {
@@ -63,10 +64,20 @@ namespace Radio.MODELO.DAO
                 if (conn != null)
                 {
                     SqlCommand command;
-                    String query = String.Format("INSERT INTO dbo.mus_usuarios (U_NOMBRE, U_USERNAME, U_PASSWORD, RAD_ID, ROL_ID) " +
-                        "VALUES ('{0}', '{1}', '{2}', '{3}', '{4}');", usuario.Nombre, usuario.NombreUsuario, usuario.Contraseña, usuario.IdRadio, usuario.IdRol);
+                    SqlDataReader sqlDataReader;
+                    String query = String.Format("SELECT * FROM dbo.mus_usuarios U WHERE U.U_USERNAME = '{0}'", nombreUsuario);
                     command = new SqlCommand(query, conn);
-                    command.ExecuteNonQuery();
+                    sqlDataReader = command.ExecuteReader();
+                    if (sqlDataReader.Read())
+                    {
+                        esRegistrado = true;
+                    }
+                    else
+                    {
+                        esRegistrado = false;
+                    }
+                    sqlDataReader.Close();
+                    command.Dispose();
                 }
             }
             catch (SqlException e)
@@ -80,10 +91,12 @@ namespace Radio.MODELO.DAO
                     conn.Close();
                 }
             }
+            return esRegistrado;
         }
 
-        public static void actualizarUsuario(Usuario usuario)
+        public static bool getUsuarioRepetidoModificar(String nombreUsuario, int idUsuario)
         {
+            bool esModificado = false;
             SqlConnection conn = null;
             try
             {
@@ -91,9 +104,20 @@ namespace Radio.MODELO.DAO
                 if (conn != null)
                 {
                     SqlCommand command;
-                    String query = String.Format("UPDATE dbo.mus_usuarios SET U_NOMBRE = '{0}' , U_USERNAME = '{1}', U_PASSWORD = '{2}', RAD_ID = '{3}', ROL_ID = '{4}' WHERE U_ID = '{5}';", usuario.Nombre, usuario.NombreUsuario, usuario.Contraseña, usuario.IdRadio, usuario.IdRol, usuario.IdUsuario);
+                    SqlDataReader sqlDataReader;
+                    String query = String.Format("SELECT * FROM dbo.mus_usuarios U WHERE U.U_USERNAME = '{0}' AND U.U_ID <> '{1}'", nombreUsuario, idUsuario);
                     command = new SqlCommand(query, conn);
-                    command.ExecuteNonQuery();
+                    sqlDataReader = command.ExecuteReader();
+                    if (sqlDataReader.Read())
+                    {
+                        esModificado = true;
+                    }
+                    else
+                    {
+                        esModificado = false;
+                    }
+                    sqlDataReader.Close();
+                    command.Dispose();
                 }
             }
             catch (SqlException e)
@@ -107,6 +131,82 @@ namespace Radio.MODELO.DAO
                     conn.Close();
                 }
             }
+            return esModificado;
+        }
+
+        public static bool registrarUsuario(Usuario usuario)
+        {
+            bool registrado = false;
+            SqlConnection conn = null;
+            try
+            {
+                conn = ConexionBD.getConnection();
+                if (!getUsuarioRepetido(usuario.NombreUsuario))
+                {
+                    if (conn != null)
+                    {
+                        SqlCommand command;
+                        String query = String.Format("INSERT INTO dbo.mus_usuarios (U_NOMBRE, U_USERNAME, U_PASSWORD, RAD_ID, ROL_ID) " +
+                            "VALUES ('{0}', '{1}', '{2}', '{3}', '{4}');", usuario.Nombre, usuario.NombreUsuario, usuario.Contraseña, usuario.IdRadio, usuario.IdRol);
+                        command = new SqlCommand(query, conn);
+                        command.ExecuteNonQuery();
+                        registrado = true;
+                    }
+                }
+                else
+                {
+                    registrado = false;
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                if (conn != null)
+                {
+                    conn.Close();
+                }
+            }
+            return registrado;
+        }
+
+        public static bool actualizarUsuario(Usuario usuario)
+        {
+            bool esActualizado = false;
+            SqlConnection conn = null;
+            try
+            {
+                conn = ConexionBD.getConnection();
+                if (!getUsuarioRepetidoModificar(usuario.NombreUsuario, usuario.IdUsuario))
+                {
+                    if (conn != null)
+                    {
+                        SqlCommand command;
+                        String query = String.Format("UPDATE dbo.mus_usuarios SET U_NOMBRE = '{0}' , U_USERNAME = '{1}', U_PASSWORD = '{2}', RAD_ID = '{3}', ROL_ID = '{4}' WHERE U_ID = '{5}';", usuario.Nombre, usuario.NombreUsuario, usuario.Contraseña, usuario.IdRadio, usuario.IdRol, usuario.IdUsuario);
+                        command = new SqlCommand(query, conn);
+                        command.ExecuteNonQuery();
+                        esActualizado = true;
+                    }
+                }
+                else
+                {
+                    esActualizado = false;
+                }
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            finally
+            {
+                if (conn != null)
+                {
+                    conn.Close();
+                }
+            }
+            return esActualizado;
         }
 
         public static void eliminarUsuario(int idUsuario)

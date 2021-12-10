@@ -33,7 +33,7 @@ namespace Radio.VISTAS
 
         private void dg_Usuarios_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(dg_Usuarios.SelectedItem != null)
+            if (dg_Usuarios.SelectedItem != null)
             {
                 usuarioSeleccionado = (Usuario)dg_Usuarios.SelectedItem;
                 btnEliminar.IsEnabled = true;
@@ -48,7 +48,7 @@ namespace Radio.VISTAS
             tbNombre.Text = usuarioSeleccionado.Nombre;
             tbNombreUsuario.Text = usuarioSeleccionado.NombreUsuario;
             tbContraseña.Text = usuarioSeleccionado.Contraseña;
-            if(usuarioSeleccionado.IdRol == 2)
+            if (usuarioSeleccionado.IdRol == 2)
             {
                 cbRol.SelectedIndex = 0;
             }
@@ -85,8 +85,15 @@ namespace Radio.VISTAS
                 usuario.Contraseña = tbContraseña.Text;
                 usuario.IdRadio = 1;
                 usuario.IdRol = ((Rol)cbRol.SelectedItem).IdRol;
-                UsuarioDAO.registrarUsuario(usuario);
-                MessageBox.Show("Usuario registrado");
+                bool registrado = UsuarioDAO.registrarUsuario(usuario);
+                if (registrado)
+                {
+                    MessageBox.Show("Usuario registrado");
+                }
+                else
+                {
+                    MessageBox.Show("No fue posible registrar, el nombre de usuario ya se encuentra registrado");
+                }
                 cargarUsuarios();
                 limpiarCampos();
             }
@@ -119,8 +126,15 @@ namespace Radio.VISTAS
                 usuarioSeleccionado.NombreUsuario = tbNombreUsuario.Text;
                 usuarioSeleccionado.Contraseña = tbContraseña.Text;
                 usuarioSeleccionado.IdRol = ((Rol)cbRol.SelectedItem).IdRol;
-                UsuarioDAO.actualizarUsuario(usuarioSeleccionado);
-                MessageBox.Show("Usuario modificado");
+                bool modificado = UsuarioDAO.actualizarUsuario(usuarioSeleccionado);
+                if (modificado)
+                {
+                    MessageBox.Show("Usuario modificado");
+                }
+                else
+                {
+                    MessageBox.Show("No fue posible actualizar el usuario, el nombre de usuario ya se encuentra registrado");
+                }
                 cargarUsuarios();
                 limpiarCampos();
             }
