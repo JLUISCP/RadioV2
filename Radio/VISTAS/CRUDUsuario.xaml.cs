@@ -85,15 +85,8 @@ namespace Radio.VISTAS
                 usuario.Contraseña = tbContraseña.Text;
                 usuario.IdRadio = 1;
                 usuario.IdRol = ((Rol)cbRol.SelectedItem).IdRol;
-                bool registrado = UsuarioDAO.registrarUsuario(usuario);
-                if (registrado)
-                {
-                    MessageBox.Show("Usuario registrado");
-                }
-                else
-                {
-                    MessageBox.Show("No fue posible registrar, el nombre de usuario ya se encuentra registrado");
-                }
+                UsuarioDAO.registrarUsuario(usuario);
+                MessageBox.Show("Usuario registrado");
                 cargarUsuarios();
                 limpiarCampos();
             }
@@ -126,15 +119,8 @@ namespace Radio.VISTAS
                 usuarioSeleccionado.NombreUsuario = tbNombreUsuario.Text;
                 usuarioSeleccionado.Contraseña = tbContraseña.Text;
                 usuarioSeleccionado.IdRol = ((Rol)cbRol.SelectedItem).IdRol;
-                bool modificado = UsuarioDAO.actualizarUsuario(usuarioSeleccionado);
-                if (modificado)
-                {
-                    MessageBox.Show("Usuario modificado");
-                }
-                else
-                {
-                    MessageBox.Show("No fue posible actualizar el usuario, el nombre de usuario ya se encuentra registrado");
-                }
+                UsuarioDAO.actualizarUsuario(usuarioSeleccionado);
+                MessageBox.Show("Usuario modificado");
                 cargarUsuarios();
                 limpiarCampos();
             }
